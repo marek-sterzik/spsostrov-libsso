@@ -17,14 +17,14 @@ Přidání přes composer není v tuto chvíli podporováno.
 
 ## Specifikace
 
-Je k dispozici taktéž [specification.md](specifikace) celého SSO protokolu v angličtině.
+Je k dispozici taktéž [specifikace](specification.md) celého SSO protokolu v angličtině.
 
 
 ## Dokumentace
 
 ### Základní použití
 
-Základní použití je reprezentováno testovací aplikací v adresáři [testapp/](testapp).
+Základní použití je reprezentováno testovací aplikací v adresáři [testapp](testapp/).
 
 Následující kód spustí celou SSO proceduru:
 
