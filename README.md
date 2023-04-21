@@ -35,14 +35,19 @@ $user = $sso->doLogin();
 
 Funkce `$sso->doLogin()` vrátí buď objekt třídy `SSOUser` reprezentující příslušného přihlášeného uživatele, nebo `null` pokud se přihlášeného uživatele nepodařilo zjistit.
 
+
+### Bezobjektový přístup
+
+Tato metoda funguje stejně jako `$sso->doLogin()` ale přihlášeného uživatele nevrací jako instanci třídy `SSOUser`, ale jako asociativní pole:
+
+```php
+$sso->doLoginAsArray();
+```
+
 ### Přístup k dílčím částem login procesu
 
 Správná funkce volání `$sso->doLogin()` v tomto případě ovšem závisí na mnoha podmínkách, které nemusí být za všech okolností splněny. Proto jsou také k dispozici metody, které spouští vždy jenom část procesu:
 
-Tato metoda funguje stejně jako `$sso->doLogin()` ale přihlášeného uživatele nevrací jako instanci třídy `SSOUser`, ale jako asociativní pole:
-```php
-$sso->doLoginAsArray();
-```
 
 Následující metoda provede pouze přesměrování na SSO server s tím, že přesměrování zpět proběhne na adresu `$backUrl`:
 ```php
@@ -77,4 +82,4 @@ $redirectUrl = $sso->getRedirectUrl($backUrl);
 * Skupiny: `$user->getGroups()`
 * Test na přítomnost uživatele ve skupině: `$user->hasGroup("ucitele")`
 * Vypsání celého uživatele jako html: `$user->prettyPrint()`
-* Převod uživatele na asociativní pole: `$user->asArray()`
+* Převod uživatele na asociativní pole: `$user->asArray()
