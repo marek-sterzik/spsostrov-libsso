@@ -82,4 +82,4 @@ $redirectUrl = $sso->getRedirectUrl($backUrl);
 * Skupiny: `$user->getGroups()`
 * Test na přítomnost uživatele ve skupině: `$user->hasGroup("ucitele")`
 * Vypsání celého uživatele jako html: `$user->prettyPrint()`
-* Převod uživatele na asociativní pole: `$user->asArray()
+* Převod uživatele na asociativní pole: `$user->asArray()`
