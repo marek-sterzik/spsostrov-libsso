@@ -59,6 +59,9 @@ $user = $sso->doLogin();
 
 Funkce `$sso->doLogin()` vrátí buď objekt třídy `SSOUser` reprezentující příslušného přihlášeného uživatele, nebo `null` pokud se přihlášeného uživatele nepodařilo zjistit.
 
+**Pozor:** Funkci `$sso->doLogin()` je potřeba volat někde na samém začátku provádění skriptu, protože veškerý kód před voláním této metody se provede **dvakrát**. Nejprve,
+před přesměrováním na SSO server a poté znova po přesměrování z SSO serveru zpět do aplikace.
+
 
 ### Bezobjektový přístup
 
