@@ -143,8 +143,11 @@ class SSOUser
         return [
             "login" => $this->login,
             "name" => $this->name,
+            "groupName" => $this->groupName,
             "groups" => $this->groups,
             "email" => $this->email,
+            "authBy" => $this->authBy,
+            "ouSimple" => $this->ouSimple,
             "otherData" => $this->otherData,
         ];
     }
