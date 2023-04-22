@@ -24,6 +24,12 @@ Je k dispozici taktéž [specifikace](specification.md) celého SSO protokolu v 
 
 ## Dokumentace
 
+Knihovna poskytuje několik tříd v rámci jmenného prostoru `SPSOstrov\SSO`. Hlavní třídou, která poskytuje funkcionalitu knihovny je třída
+`SSO`. Tj. její plně kvalifikované jméno je `SPSOstrov\SSO\SSO`. Nicméně, pokud je knihovna načtena přes `lib/libsso.php`, je na třítu
+`SPSOstrov\SSO\SSO` vytvořen alias `SSO`, takže je možné potom příslušnou třídu používat i v základním jmenném prostoru bez použití direktivy `use`.
+V případě načtení knihovny přes composer není příslušný alias třídy vytvářen a je potřeba použít direktivu `use`.
+
+
 ### Základní použití
 
 Základní použití je reprezentováno testovací aplikací v adresáři [testapp](testapp/).
