@@ -1,5 +1,7 @@
 <?php
-
+/**
+ * This class represents the SPŠ Ostrov single sign-on procedure.
+ */
 class SSO
 {
     const SSO_GATEWAY_URL = "https://titan.spsostrov.cz/ssogw/";
@@ -7,15 +9,43 @@ class SSO
     const SERVICE_ARG = "service";
     const TOKEN_ARG = "ticket";
 
+    /** @var string SSO gateway URL */
     private string $ssoGatewayUrl;
+
+    /** @var string SSO gateway check URL */
     private string $ssoGatewayCheckUrl;
 
+    /**
+     * Create a new instnace of the SSO library.
+     *
+     * @param string|null $ssoGatewayUrl SSO gateway URL (use default if not speicfied)
+     * @param string|null $ssoGatewayCheckUrl SSO gateway check URL (use default if not specified)
+     */
     public function __construct(?string $ssoGatewayUrl = null, ?string $ssoGatewayCheckUrl = null)
     {
         $this->ssoGatewayUrl = $ssoGatewayUrl ?? self::SSO_GATEWAY_URL;
         $this->ssoGatewayCheckUrl = $ssoGatewayCheckUrl ?? self::SSO_GATEWAY_CHECK_URL;
     }
 
+    /**
+     * Do the whole "magic" in a single step.
+     *
+     * @return SSOUser|null instance of SSOUser representing the currently logged-in user or null
+     */
+    public function doLogin(): ?SSOUser
+    {
+        if ($this->getDefaultToken() !== null) {
+            return $this->getLoginCredentials();
+        } else {
+            $this->doRedirect();
+        }
+    }
+
+    /**
+     * Do the whole "magic" in a single step. The same as doLogin(), but the user is returned as an associative array.
+     *
+     * @return array|null array representing the currently logged-in user or null
+     */
     public function doLoginAsArray(): ?array
     {
         $user = $this->doLogin();
@@ -25,15 +55,14 @@ class SSO
         return $user;
     }
 
-    public function doLogin(): ?SSOUser
-    {
-        if ($this->isTokenAvailable()) {
-            return $this->getLoginCredentials();
-        } else {
-            $this->doRedirect();
-        }
-    }
-
+    /**
+     * Do the second phase of the login procedure
+     *
+     * @param string|null $token The token returned from SSO
+     * @param string|null $backUrl The url the user was redirected to from SSO 
+     *                             (May be specified as full url, absolute path or relative path)
+     * @return SSOUser|null instance of SSOUser representing the currently logged-in user or null
+     */
     public function getLoginCredentials(?string $token = null, ?string $backUrl = null): ?SSOUser
     {
         $token = $token ?? $this->getDefaultToken();
@@ -43,16 +72,37 @@ class SSO
         return $this->querySSOCheckUrl($token, $backUrl);
     }
 
+    /**
+     * Return the token passed by SSO to phase 2.
+     * 
+     * @return string|null SSO token or null if SSO token is not available
+     */
     public function getDefaultToken(): ?string
     {
         return $_GET[self::TOKEN_ARG] ?? null;
     }
 
-    public function isTokenAvailable(): bool
+    /**
+     * Do the first phase of the login procedure (redirect to SSO)
+     * 
+     * @param string|null $backUrl The url the user was redirected to from SSO 
+     *                             (May be specified as full url, absolute path or relative path)
+     * @return string|null SSO token or null if SSO token is not available
+     */
+    public function doRedirect(?string $backUrl = null): void
     {
-        return $this->getDefaultToken() !== null;
+        $redirectUrl = $this->getRedirectUrl($backUrl);
+        header(sprintf("Location: %s", $redirectUrl));
+        exit;
     }
 
+    /**
+     * Return the url where to redirect as the first phase of the login. (in case the APP want to
+     * make the redirection by its own.
+     * @param string|null $backUrl The url the user was redirected to from SSO 
+     *                             (May be specified as full url, absolute path or relative path)
+     * @return string SSO URL where to redirect
+     */
     public function getRedirectUrl(?string $backUrl = null): string
     {
         $realBackUrlEncoded = base64_encode($x = $this->getRealBackUrl($backUrl));
@@ -64,13 +114,6 @@ class SSO
             urlencode(self::SERVICE_ARG),
             urlencode($realBackUrlEncoded)
         );
-    }
-
-    public function doRedirect(?string $backUrl = null): void
-    {
-        $redirectUrl = $this->getRedirectUrl($backUrl);
-        header(sprintf("Location: %s", $redirectUrl));
-        exit;
     }
 
     private function querySSOCheckUrl(string $token, ?string $backUrl): ?SSOUser

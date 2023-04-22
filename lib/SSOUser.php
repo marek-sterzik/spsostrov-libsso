@@ -1,13 +1,29 @@
 <?php
 
+/**
+ * This class represents the currently logged in user from SSO.
+ */
 class SSOUser
 {
+    /** @var string user's login */
     private string $login;
+    
+    /** @var string user's full name */
     private string $name;
+    
+    /** @var string[] user's groups */
     private array $groups;
+    
+    /** @var string|null user's e-mail */
     private ?string $email;
+
+    /** @var array other data not yet understood by the library */
     private array $otherData;
 
+    /**
+     * Create an user. The user should never be created manually. The user is
+     * always created by the class SSO.
+     */
     public function __construct(array $data)
     {
         $this->login = $this->extractKey($data, "login");
@@ -18,41 +34,71 @@ class SSOUser
 
     }
 
+    /**
+     * @return string User's login
+     */
     public function getLogin(): string
     {
         return $this->login;
     }
 
+    /**
+     * @return string User's full name
+     */
     public function getName(): string
     {
         return $this->name;
     }
 
+    /**
+     * @return array User's groups where the user belongs to
+     */
     public function getGroups(): array
     {
         return $this->groups;
     }
 
+    /**
+     * Test if the user belongs to a particular group.
+     * @param string $group The group being tested
+     * @return bool true if the user belongs to the particular group
+     */
     public function hasGroup(string $group): bool
     {
         return in_array($group, $this->groups);
     }
 
+    /**
+     * @return string|null User's e-mail
+     */
     public function getEmail(): ?string
     {
         return $this->email;
     }
 
+    /**
+     * @return array User's data not yet understood by the library
+     */
     public function getOtherData(): array
     {
         return $this->otherData;
     }
 
+    /**
+     * Print the user as HTML.
+     * @param bool $return true if the html string should be returned
+     *                     false if the html string should be echoed to stdout
+     * @return string the returned html in case $return is true, null otherwise
+     */
     public function prettyPrint(bool $return = false): ?string
     {
         return (new SSOUserPrinter())->print($this, $return);
     }
 
+    /**
+     * Convert the user to a representation by an associative array.
+     * @return array The associative array representation of the user
+     */
     public function asArray(): array
     {
         return [
