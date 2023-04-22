@@ -12,10 +12,19 @@ class SSOUser
     private string $name;
     
     /** @var string[] user's groups */
-    private array $groups;
-    
+    private array $groups = [];
+
     /** @var string|null user's e-mail */
-    private ?string $email;
+    private ?string $email = null;
+
+    /** @var string|null group name */
+    private ?string $groupName = null;
+
+    /** @var string|null auth by info */
+    private ?string $authBy = null;
+
+    /** @var string|null ou simple info */
+    private ?string $ouSimple = null;
 
     /** @var array other data not yet understood by the library */
     private array $otherData;
@@ -30,6 +39,10 @@ class SSOUser
         $this->name = $this->extractKey($data, "name");
         $this->groups = $this->extractKey($data, "group", true);
         $this->email = $this->extractKey($data, "mail");
+        $this->groupName = $this->extractKey($data, "group_name");
+        $this->groupName = ($this->groupName === '') ? null : $this->groupName;
+        $this->authBy = $this->extractKey($data, "auth_by");
+        $this->ouSimple = $this->extractKey($data, "ou_simple");
         $this->otherData = $data;
 
     }
@@ -48,6 +61,14 @@ class SSOUser
     public function getName(): string
     {
         return $this->name;
+    }
+
+    /**
+     * @return string|null User's group name
+     */
+    public function getGroupName(): ?string
+    {
+        return $this->groupName;
     }
 
     /**
@@ -74,6 +95,22 @@ class SSOUser
     public function getEmail(): ?string
     {
         return $this->email;
+    }
+
+    /**
+     * @return string|null User's auth by info
+     */
+    public function getAuthBy(): ?string
+    {
+        return $this->authBy;
+    }
+
+    /**
+     * @return string|null User's ou simple info
+     */
+    public function getOUSimple(): ?string
+    {
+        return $this->ouSimple;
     }
 
     /**

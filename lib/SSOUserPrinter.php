@@ -43,7 +43,10 @@ class SSOUserPrinter
         $html .= $this->getRowHtml("Login", $user->getLogin());
         $html .= $this->getRowHtml("Name", $user->getName());
         $html .= $this->getRowHtml("E-mail", $user->getEmail());
+        $html .= $this->getRowHtml("Group", $user->getGroupName());
         $html .= $this->getRowHtml("Groups", $groups);
+        $html .= $this->getRowHtml("Auth by", $user->getAuthBy());
+        $html .= $this->getRowHtml("OU Simple", $user->getOUSimple());
         foreach ($user->getOtherData() as $key => $value) {
             $value = empty($value) ? null : implode(", ", $value);
             $html .= $this->getRowHtml(sprintf("Other[%s]", $key), $value);

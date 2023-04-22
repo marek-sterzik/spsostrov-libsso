@@ -152,7 +152,7 @@ class SSO
             if (count($record) !== 2) {
                 continue;
             }
-            if (!preg_match('/^[a-z]+$/', $record[0])) {
+            if (!preg_match('/^[a-z_]+$/', $record[0])) {
                 continue;
             }
             list($key, $value) = $record;

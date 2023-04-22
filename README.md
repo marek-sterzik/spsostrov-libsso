@@ -79,7 +79,10 @@ $redirectUrl = $sso->getRedirectUrl($backUrl);
 * Login: `$user->getLogin()`
 * Plné jméno: `$user->getName()`
 * E-mail: `$user->getEmail()`
+* Název skupiny: `$user->getGroupName()`
 * Skupiny: `$user->getGroups()`
 * Test na přítomnost uživatele ve skupině: `$user->hasGroup("ucitele")`
+* Auth by: `$user->getAuthBy()`
+* OU Simple: `$user->getOUSimple()`
 * Vypsání celého uživatele jako html: `$user->prettyPrint()`
 * Převod uživatele na asociativní pole: `$user->asArray()`
