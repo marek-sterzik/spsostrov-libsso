@@ -39,7 +39,7 @@ V případě načtení knihovny přes composer nejsou třídní aliasy automatic
 SPSOstrov\SSO\SSO::enableAliases();
 ```
 
-Lze také pracovat bez aliasů jednoduše použitím direktivy `use`:
+Lze také pracovat bez aliasů jednoduše použitím direktivy `use`, podle standardních pravidel práce s jmennými prostory v jazyce PHP:
 
 ```php
 use SPSOstrov\SSO\SSO;
