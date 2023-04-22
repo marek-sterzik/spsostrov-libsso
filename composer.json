@@ -2,6 +2,7 @@
     "name": "spsostrov/libsso",
     "description": "The SPŠ Ostrov school's SSO library",
     "license": "MIT",
+    "homepage": "https://github.com/marek-sterzik/spsostrov-libsso",
     "authors": [
         {
             "name": "Marek Sterzik",

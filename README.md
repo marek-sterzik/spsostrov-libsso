@@ -12,7 +12,9 @@ Toto je repozitář knihovny pro komunikaci s SSO systémem ve škole SPŠ Ostro
 
 ### Přidání přes composer
 
-Přidání přes composer není v tuto chvíli podporováno.
+```
+composer require spsostrov/libsso
+```
 
 
 ## Specifikace
