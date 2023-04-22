@@ -12,6 +12,17 @@ class SSO
     const SERVICE_ARG = "service";
     const TOKEN_ARG = "ticket";
 
+    private static bool $aliasesEnabled = false;
+
+    public static function enableAliases(): void
+    {
+        if (!self::$aliasesEnabled) {
+            class_alias(SSO::class, "SSO");
+            class_alias(SSOUser::class, "SSOUser");
+            self::$aliasesEnabled = true;
+        }
+    }
+
     /** @var string SSO gateway URL */
     private string $ssoGatewayUrl;
 
