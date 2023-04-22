@@ -2,13 +2,15 @@
 
 namespace SPSOstrov\SSO;
 
+use Exception;
+
 /**
  * This class represents the SPŠ Ostrov single sign-on procedure.
  */
 class SSO
 {
     const SSO_GATEWAY_URL = "https://titan.spsostrov.cz/ssogw/";
-    const SSO_GATEWAY_CHECK_URL = "https://titan.spsostrov.cz/ssogw/service-check.php";
+    const SSO_GATEWAY_CHECK_URL = "service-check.php";
     const SERVICE_ARG = "service";
     const TOKEN_ARG = "ticket";
 
@@ -38,7 +40,7 @@ class SSO
     public function __construct(?string $ssoGatewayUrl = null, ?string $ssoGatewayCheckUrl = null)
     {
         $this->ssoGatewayUrl = $ssoGatewayUrl ?? self::SSO_GATEWAY_URL;
-        $this->ssoGatewayCheckUrl = $ssoGatewayCheckUrl ?? self::SSO_GATEWAY_CHECK_URL;
+        $this->ssoGatewayCheckUrl = $this->resolveRelativePath($ssoGatewayCheckUrl ?? self::SSO_GATEWAY_CHECK_URL, $this->ssoGatewayUrl);
     }
 
     /**
@@ -181,17 +183,12 @@ class SSO
 
     private function getRealBackUrl(?string $backUrl): string
     {
-        if ($backUrl !== null && $backUrl !== '') {
-            if (preg_match('|^https?://|', $backUrl)) {
-                return $backUrl;
-            } elseif ($backUrl[0] === '/') {
-                return $this->detectMyUrlHost() . $backUrl;
-            } else {
-                return $this->canonizePath($this->detectMyUrlDirPath() . $backUrl);
-            }
-        } else {
-            return $this->detectMyUrlHost() . $this->detectMyUrlPath();
-        }
+        return $this->resolveRelativePath($backUrl, $this->detectMyUrl());
+    }
+
+    private function detectMyUrl(): string
+    {
+        return $this->detectMyUrlHost() . $this->detectMyUrlPath();
     }
 
     private function detectMyUrlHost(): string
@@ -205,17 +202,54 @@ class SSO
         return sprintf("%s://", $scheme);
     }
 
-    private function detectMyUrlDirPath(): string
+    private function getDirFromPath(string $path): string
     {
-        $myPath = $this->detectMyUrlPath();
-        if (substr($myPath, "-1") !== "/") {
-            $myPath = dirname($myPath) . "/";
+        if (substr($path, "-1") !== "/") {
+            $path = dirname($path) . "/";
         }
-        return $myPath;
+        return $path;
     }
 
     private function detectMyUrlPath(): string
     {
-        return strtok($_SERVER["REQUEST_URI"],'?');
+        return strtok($_SERVER["REQUEST_URI"], '?');
+    }
+
+    private function resolveRelativePath(?string $relativePath, string $absoluteUrl): string
+    {
+            if ($relativePath === null || $relativePath === '') {
+                return $absoluteUrl;
+            } if (preg_match('|^https?://|', $relativePath)) {
+                return $relativePath;
+            } else {
+                $parsed = parse_url($absoluteUrl);
+                if ($parsed === false || !isset($parsed['path']) || !isset($parsed['host']) || !isset($parsed['scheme'])) {
+                    throw new Exception("Invalid absolute URL");
+                }
+                $path = $parsed['path'];
+                if (substr($relativePath, 0, 1) === '/') {
+                    $path = $relativePath;
+                } else {
+                    $path = $this->canonizePath($this->getDirFromPath($path) . $relativePath);
+                }
+                $port = isset($parsed['port']) ? sprintf(":%d", $parsed['port']) : '';
+                return sprintf("%s://%s%s%s", $parsed['scheme'], $parsed['host'], $port, $path);
+            }
+    }
+
+    private function canonizePath(string $path): string
+    {
+        $finalPath = [];
+        foreach(explode("/", $path) as $name) {
+            if ($name === '.' || $name === '') {
+                continue;
+            }
+            if ($name === '..') {
+                array_pop($finalPath);
+            } else {
+                $finalPath[] = $name;
+            }
+        }
+        return '/' . implode('/', $finalPath);
     }
 }
