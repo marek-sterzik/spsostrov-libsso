@@ -1,0 +1,19 @@
+{
+    "name": "spsostrov/libsso",
+    "description": "The SPŠ Ostrov school's SSO library",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Marek Sterzik",
+            "email": "sterzik@spsostrov.cz"
+        }
+    ],
+    "autoload" : {
+        "psr-4": {
+            "SPSOstrov\\SSO\\": "lib/classes"
+        }
+    },
+    "require": {
+        "php": ">=7.1"
+    }
+}

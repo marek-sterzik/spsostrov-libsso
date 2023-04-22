@@ -6,10 +6,10 @@ session_start();
 
 
 if ($_GET['logout'] ?? null) {
-    $_SESSION["user"] = null;
+    logIn(null);
 } else {
     $sso = new SSO();
-    $_SESSION["user"] = $sso->doLogin();
+    logIn($sso->doLogin());
 }
 
 header("Location: index.php");

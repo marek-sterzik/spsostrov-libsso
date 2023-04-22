@@ -3,7 +3,8 @@
 require_once __DIR__ . "/_bootstrap.php";
 
 session_start();
-$user = $_SESSION["user"] ?? null;
+
+$user = getLoggedInUser();
 
 ?><!doctype html>
 <html>
