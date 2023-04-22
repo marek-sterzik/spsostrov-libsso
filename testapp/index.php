@@ -9,8 +9,9 @@ $user = getLoggedInUser();
 ?><!doctype html>
 <html>
 <head>
-    <link rel="stylesheet" href="media/style.css">
     <title>SSO test app</title>
+    <link rel="stylesheet" href="media/style.css">
+    <link rel="icon" type="image/x-icon" href="media/spsostrov.png">
 </head>
 <body>
     <div class="head">
