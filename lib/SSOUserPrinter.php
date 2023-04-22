@@ -23,7 +23,7 @@ class SSOUserPrinter
         $html .= $this->getRowHtml("E-mail", $user->getEmail());
         $html .= $this->getRowHtml("Groups", $groups);
         foreach ($user->getOtherData() as $key => $value) {
-            $value = empty($value) ? null : implode(", ");
+            $value = empty($value) ? null : implode(", ", $value);
             $html .= $this->getRowHtml(sprintf("Other[%s]", $key), $value);
         }
         $html .= "</table>\n";
