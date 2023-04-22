@@ -7,6 +7,11 @@ namespace SPSOstrov\SSO;
  */
 class SSOUser
 {
+    const OU_TEACHER = "ucitele";
+    const OU_STUDENT_REGEXP = "/^(.)([0-9]{2})(.{1,2})$/";
+    const OU_STUDENT_REGEXP_FOS_FIELD = 1;
+    const OU_STUDENT_REGEXP_YEAR_FIELD = 2;
+
     /** @var string user's login */
     private string $login;
     
@@ -116,6 +121,56 @@ class SSOUser
     }
 
     /**
+     * @return bool true if the user is a teacher
+     */
+    public function isTeacher(): bool
+    {
+        return $this->ouSimple === self::OU_TEACHER;
+    }
+
+    /**
+     * @return bool true if the user is a student
+     */
+    public function isStudent(): bool
+    {
+        return preg_match(self::OU_STUDENT_REGEXP, $this->ouSimple);
+    }
+
+    /**
+     * @return bool the student's field of study if the user is a student, null otherwise
+     */
+    public function getFieldOfStudy(): ?string
+    {
+        $fos = $this->getOUStudentField(self::OU_STUDENT_REGEXP_FOS_FIELD);
+        return isset($fos) ? strtoupper($fos) : $fos;
+    }
+
+    /**
+     * @return bool the student's study entry year
+     */
+    public function getStudyEntryYear(): ?int
+    {
+        $year = $this->getOUStudentField(self::OU_STUDENT_REGEXP_YEAR_FIELD);
+        if ($year === null) {
+            return null;
+        }
+        $year = (int)$year;
+        if ($year < 100) {
+            $thisYear = (int)date("Y");
+            $yearBase = $thisYear - ($thisYear % 100);
+            $year += $yearBase;
+            if ($year > $thisYear + 1) {
+                $year -= 100;
+            }
+            return $year;
+        }
+        if ($year > 2000) {
+            return $year;
+        }
+        return null;
+    }
+
+    /**
      * @return array User's data not yet understood by the library
      */
     public function getOtherData(): array
@@ -148,6 +203,10 @@ class SSOUser
             "email" => $this->email,
             "authBy" => $this->authBy,
             "ouSimple" => $this->ouSimple,
+            "isTeacher" => $this->isTeacher(),
+            "isStudent" => $this->isStudent(),
+            "fieldOfStudy" => $this->getFieldOfStudent(),
+            "studyEntryYear" => $this->getStudyEntryYear(),
             "otherData" => $this->otherData,
         ];
     }
@@ -157,5 +216,13 @@ class SSOUser
         $extracted = $data[$key] ?? [];
         unset($data[$key]);
         return $multiValue ? $extracted : array_pop($extracted);
+    }
+
+    private function getOUStudentField(int $field): ?string
+    {
+        if (!preg_match(self::OU_STUDENT_REGEXP, $this->ouSimple, $matches)) {
+            return null;
+        }
+        return $matches[$field] ?? null;
     }
 }
