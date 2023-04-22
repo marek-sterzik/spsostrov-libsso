@@ -12,6 +12,9 @@ $user = $_SESSION["user"] ?? null;
     <title>SSO test app</title>
 </head>
 <body>
+    <div class="head">
+        <img src="media/spsostrov.png">
+    </div>
     <h1>SPŠ Ostrov SSO library test application</h1>
     <div class="userinfo">
         <?php if($user): ?>

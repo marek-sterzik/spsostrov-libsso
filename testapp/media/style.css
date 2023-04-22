@@ -1,5 +1,6 @@
 h1 { color: red; text-align: center; margin: 2% auto; }
 body{ margin: 0 auto; font-family: Arial, sans-serif; }
+div.head {max-width: 30em; margin: 1em auto; text-align: center;}
 .userinfo {max-width: 30em; margin: 1em auto;}
 .userinfo>div{ background-color: #696969; margin: 1em auto; font-size: 15px; padding: 10px; border-radius: .4em; color: #fff; box-shadow: 2px 2px 5px #a0a0a0;}
 .userinfo>table{margin: 1em auto;}
