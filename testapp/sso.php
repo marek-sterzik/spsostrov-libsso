@@ -1,6 +1,6 @@
 <?php
 
-require_once dirname(__DIR__)."/lib/libsso.php";
+require_once __DIR__ . "/_bootstrap.php";
 
 session_start();
 

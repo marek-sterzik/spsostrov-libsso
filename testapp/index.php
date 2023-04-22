@@ -1,6 +1,6 @@
 <?php
 
-require_once dirname(__DIR__)."/lib/libsso.php";
+require_once __DIR__ . "/_bootstrap.php";
 
 session_start();
 $user = $_SESSION["user"] ?? null;
@@ -9,6 +9,7 @@ $user = $_SESSION["user"] ?? null;
 <html>
 <head>
     <link rel="stylesheet" href="media/style.css">
+    <title>SSO test app</title>
 </head>
 <body>
     <h1>SPŠ Ostrov SSO library test application</h1>
