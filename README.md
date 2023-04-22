@@ -73,9 +73,9 @@ $sso->doLoginAsArray();
 Správná funkce volání `$sso->doLogin()` v tomto případě ovšem závisí na mnoha podmínkách, které nemusí být za všech okolností splněny. Proto jsou také k dispozici metody, které spouští vždy jenom část procesu:
 
 
-Následující metoda provede pouze přesměrování na SSO server s tím, že přesměrování zpět proběhne na adresu `$backUrl`:
+Následující metoda provede pouze přesměrování na SSO server (1. fázi autorizaci) s tím, že přesměrování zpět proběhne na adresu `$backUrl`:
 ```php
-$sso->doLogin($backUrl);
+$sso->doRedirect($backUrl);
 ```
 
 Lze přitom použít následující možnosti pro `$backUrl`:
@@ -86,7 +86,7 @@ $backUrl = "/cesta/k/sso"; //absolutní cesta na aktuálním serveru
 $backUrl = "sso.php"; //relativní cesta vůči právě prováděnému skriptu
 ```
 
-Následující volání provede druhou část autorizace:
+Následující volání provede druhou fázi autorizace:
 ```php
 $sso->getLoginCredentials($token, $backUrl);
 ```
