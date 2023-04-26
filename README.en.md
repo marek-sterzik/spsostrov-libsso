@@ -42,6 +42,14 @@ the command:
 SPSOstrov\SSO\SSO::enableAliases();
 ```
 
+If you want to load the library using `lib/libsso.php` and you don't want to use the aliases to the root namespace, you may just define the constant
+`SPSOSTROV_SSO_NO_ALIASES` before including the file:
+
+```php
+define("SPSOSTROV_SSO_NO_ALIASES", true);
+require_once $ssoLibDir . "/lib/libsso.php";
+```
+
 But of course the recommended usage is by using the `use` directive, according to the standard rules of the PHP language:
 
 ```php

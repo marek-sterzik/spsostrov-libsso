@@ -42,6 +42,14 @@ V případě načtení knihovny přes composer nejsou třídní aliasy automatic
 SPSOstrov\SSO\SSO::enableAliases();
 ```
 
+Pokud chcete načíst knihovnu `lib/libsso.php` a zároveň nechcete používat aliasy v kořenovém jmenném prostoru, prostě definujte konstantu
+`SPSOSTROV_SSO_NO_ALIASES` před načtením příslušného souboru:
+
+```php
+define("SPSOSTROV_SSO_NO_ALIASES", true);
+require_once $ssoLibDir . "/lib/libsso.php";
+```
+
 Lze také pracovat bez aliasů jednoduše použitím direktivy `use`, podle standardních pravidel práce s jmennými prostory v jazyce PHP:
 
 ```php
