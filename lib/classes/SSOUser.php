@@ -205,7 +205,7 @@ class SSOUser
             "ouSimple" => $this->ouSimple,
             "isTeacher" => $this->isTeacher(),
             "isStudent" => $this->isStudent(),
-            "fieldOfStudy" => $this->getFieldOfStudent(),
+            "fieldOfStudy" => $this->getFieldOfStudy(),
             "studyEntryYear" => $this->getStudyEntryYear(),
             "otherData" => $this->otherData,
         ];
