@@ -8,8 +8,8 @@ namespace SPSOstrov\SSO;
 class SSOUser
 {
     const OU_TEACHER = "ucitele";
-    const OU_STUDENT_REGEXP = "/^(.)([0-9]{2})(.)(.?)$/";
-    const OU_STUDENT_REGEXP_FOS_FIELD = 1;
+    const OU_STUDENT_REGEXP = "/^(.)([0-9]{2})(.{1,2})$/";
+    const OU_STUDENT_REGEXP_FOS_FIELD = 3;
     const OU_STUDENT_REGEXP_YEAR_FIELD = 2;
 
     /** @var string user's login */
