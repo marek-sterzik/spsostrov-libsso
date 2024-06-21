@@ -8,7 +8,7 @@ namespace SPSOstrov\SSO;
 class SSOUser
 {
     const OU_TEACHER = "ucitele";
-    const OU_STUDENT_REGEXP = "/^(.)([0-9]{2})(.{1,2})$/";
+    const OU_STUDENT_REGEXP = "/^(.)([0-9]{2})(.)(.?)$/";
     const OU_STUDENT_REGEXP_FOS_FIELD = 1;
     const OU_STUDENT_REGEXP_YEAR_FIELD = 2;
 
@@ -33,6 +33,9 @@ class SSOUser
     /** @var string|null ou simple info */
     private ?string $ouSimple = null;
 
+    /** @var string|null ou name info */
+    private ?string $ouName = null;
+
     /** @var array other data not yet understood by the library */
     private array $otherData;
 
@@ -50,6 +53,7 @@ class SSOUser
         $this->groupName = ($this->groupName === '') ? null : $this->groupName;
         $this->authBy = $this->extractKey($data, "auth_by");
         $this->ouSimple = $this->extractKey($data, "ou_simple");
+        $this->ouName = $this->extractKey($data, "ou_name");
         $this->otherData = $data;
 
     }
@@ -121,6 +125,14 @@ class SSOUser
     }
 
     /**
+     * @return string|null User's ou name info
+     */
+    public function getOUName(): ?string
+    {
+        return $this->ouName;
+    }
+
+    /**
      * @return bool true if the user is a teacher
      */
     public function isTeacher(): bool
@@ -134,6 +146,14 @@ class SSOUser
     public function isStudent(): bool
     {
         return preg_match(self::OU_STUDENT_REGEXP, $this->ouSimple);
+    }
+
+    /**
+     * @return string|null Student's class name or null if the user is not a student
+     */
+    public function getClass(): ?string
+    {
+        return $this->isStudent() ? $this->getOUName() : null;
     }
 
     /**
@@ -203,10 +223,12 @@ class SSOUser
             "email" => $this->email,
             "authBy" => $this->authBy,
             "ouSimple" => $this->ouSimple,
+            "ouName" => $this->ouName,
             "isTeacher" => $this->isTeacher(),
             "isStudent" => $this->isStudent(),
             "fieldOfStudy" => $this->getFieldOfStudy(),
             "studyEntryYear" => $this->getStudyEntryYear(),
+            "class" => $this->getClass(),
             "otherData" => $this->otherData,
         ];
     }

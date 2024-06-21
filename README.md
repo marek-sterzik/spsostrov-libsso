@@ -124,8 +124,10 @@ $redirectUrl = $sso->getRedirectUrl($backUrl);
 * Test na přítomnost uživatele ve skupině: `$user->hasGroup("ucitele")`
 * Auth by: `$user->getAuthBy()`
 * OU Simple: `$user->getOUSimple()`
+* OU Name: `$user->getOUName()`
 * Test zda je uživatel učitel: `$user->isTeacher()`
 * Test zda je uživatel student: `$user->isStudent()`
+* Třída: `$user->getClass()` (pouze pro studenty, pro ne-studenty je hodnota vždy `null`)
 * Obor studia: `$user->getFieldOfStudy()` (pouze pro studenty, pro ne-studenty je hodnota vždy `null`)
 * Rok počátku studia: `$user->getStudyEntryYear()` (pouze pro studenty, pro ne-studenty je hodnota vždy `null`)
 * Vypsání celého uživatele jako html: `$user->prettyPrint()`

@@ -50,9 +50,11 @@ class SSOUserPrinter
         $html .= $this->getRowHtml("Groups", $user->getGroups());
         $html .= $this->getRowHtml("Auth by", $user->getAuthBy());
         $html .= $this->getRowHtml("OU Simple", $user->getOUSimple());
+        $html .= $this->getRowHtml("OU Name", $user->getOUName());
         $html .= $this->getRowHtml("Is teacher", $user->isTeacher());
         $html .= $this->getRowHtml("Is student", $user->isStudent());
         if ($user->isStudent()) {
+            $html .= $this->getRowHtml("Class", $user->getClass());
             $html .= $this->getRowHtml("Field of study", $user->getFieldOfStudy());
             $html .= $this->getRowHtml("Study entry year", $user->getStudyEntryYear());
         }
