@@ -31,16 +31,23 @@ class SSO
     /** @var string SSO gateway check URL */
     private string $ssoGatewayCheckUrl;
 
+    /** @var string Class to create an SSO User */
+    private string $ssoUserClass;
+
     /**
      * Create a new instnace of the SSO library.
      *
      * @param string|null $ssoGatewayUrl SSO gateway URL (use default if not speicfied)
      * @param string|null $ssoGatewayCheckUrl SSO gateway check URL (use default if not specified)
      */
-    public function __construct(?string $ssoGatewayUrl = null, ?string $ssoGatewayCheckUrl = null)
+    public function __construct(?string $ssoGatewayUrl = null, ?string $ssoGatewayCheckUrl = null, ?string $ssoUserClass = null)
     {
         $this->ssoGatewayUrl = $ssoGatewayUrl ?? self::SSO_GATEWAY_URL;
         $this->ssoGatewayCheckUrl = $this->resolveRelativePath($ssoGatewayCheckUrl ?? self::SSO_GATEWAY_CHECK_URL, $this->ssoGatewayUrl);
+        $this->ssoUserClass = $ssoUserClass ?? SSOUser::class;
+        if (!is_a($this->ssoUserClass, SSOUser::class, true)) {
+            throw new Exception("ssoUserClass needs to be a subclass of " . SSOUser::class);
+        }
     }
 
     /**
@@ -153,7 +160,7 @@ class SSO
         if (!isset($result["login"]) || !isset($result["name"])) {
             return null;
         }
-        return new SSOUser($result);
+        return new $this->ssoUserClass($result);
     }
 
     private function parseSSOResponseToArray(string $userDataString): array
