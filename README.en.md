@@ -127,9 +127,12 @@ $redirectUrl = $sso->getRedirectUrl($backUrl);
 * Test if the user has a group: `$user->hasGroup("ucitele")`
 * Auth by: `$user->getAuthBy()`
 * OU Simple: `$user->getOUSimple()`
+* OU Name: `$user->getOUName()`
 * Test if the user is a teacher: `$user->isTeacher()`
 * Test if the user is a student: `$user->isStudent()`
+* Class: `$user->getClass()` (only for students, `null` otherwise)
 * Field of study: `$user->getFieldOfStudy()` (only for students, `null` otherwise)
 * Study entry year: `$user->getStudyEntryYear()` (only for students, `null` otherwise)
+* Unix timestamp when the user logged in: `$user->getLoginTimestamp()`
 * Print the user as html: `$user->prettyPrint()`
 * Convert the user to an associative array: `$user->asArray()`

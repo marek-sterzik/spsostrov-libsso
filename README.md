@@ -130,5 +130,6 @@ $redirectUrl = $sso->getRedirectUrl($backUrl);
 * Třída: `$user->getClass()` (pouze pro studenty, pro ne-studenty je hodnota vždy `null`)
 * Obor studia: `$user->getFieldOfStudy()` (pouze pro studenty, pro ne-studenty je hodnota vždy `null`)
 * Rok počátku studia: `$user->getStudyEntryYear()` (pouze pro studenty, pro ne-studenty je hodnota vždy `null`)
+* Časová značka (unix timestamp) přihlášení uživatele: `$user->getLoginTimestamp()`
 * Vypsání celého uživatele jako html: `$user->prettyPrint()`
 * Převod uživatele na asociativní pole: `$user->asArray()`
