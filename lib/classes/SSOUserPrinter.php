@@ -62,6 +62,8 @@ class SSOUserPrinter
             $value = empty($value) ? null : implode(", ", $value);
             $html .= $this->getRowHtml(sprintf("Other[%s]", $key), $value);
         }
+        $loginTimestamp = ((new DateTime())->setTimestamp($user->getLoginTimestamp()))->format("c");
+        $html .= $this->getRowHtml("Logged in at", $loginTimestamp);
         $html .= "</table>\n";
         return $html;
     }

@@ -39,11 +39,14 @@ class SSOUser
     /** @var array other data not yet understood by the library */
     private array $otherData;
 
+    /** @var int unix timestamp when the login was proceeded */
+    private int $loginTimestamp;
+
     /**
      * Create an user. The user should never be created manually. The user is
      * always created by the class SSO.
      */
-    public function __construct(array $data)
+    public function __construct(array $data, int $loginTimestamp)
     {
         $this->login = $this->extractKey($data, "login");
         $this->name = $this->extractKey($data, "name");
@@ -55,7 +58,7 @@ class SSOUser
         $this->ouSimple = $this->extractKey($data, "ou_simple");
         $this->ouName = $this->extractKey($data, "ou_name");
         $this->otherData = $data;
-
+        $this->loginTimestamp = $loginTimestamp;
     }
 
     /**
@@ -199,6 +202,14 @@ class SSOUser
     }
 
     /**
+     * @return int Unix timestamp when the login was proceeded
+     */
+    public function getLoginTimestamp(): int
+    {
+        return $this->loginTimestamp;
+    }
+
+    /**
      * Print the user as HTML.
      * @param bool $return true if the html string should be returned
      *                     false if the html string should be echoed to stdout
@@ -230,6 +241,7 @@ class SSOUser
             "studyEntryYear" => $this->getStudyEntryYear(),
             "class" => $this->getClass(),
             "otherData" => $this->otherData,
+            "loginTimestamp" => $this->loginTimestamp,
         ];
     }
 

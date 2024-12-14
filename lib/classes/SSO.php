@@ -160,7 +160,7 @@ class SSO
         if (!isset($result["login"]) || !isset($result["name"])) {
             return null;
         }
-        return new $this->ssoUserClass($result);
+        return new $this->ssoUserClass($result, time());
     }
 
     private function parseSSOResponseToArray(string $userDataString): array
