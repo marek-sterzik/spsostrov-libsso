@@ -2,6 +2,8 @@
 
 namespace SPSOstrov\SSO;
 
+use DateTime;
+
 /**
  * This class is responsible for pretty-printing the content of the SSOUser object.
  */
