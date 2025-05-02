@@ -136,3 +136,35 @@ $redirectUrl = $sso->getRedirectUrl($backUrl);
 * Unix timestamp when the user logged in: `$user->getLoginTimestamp()`
 * Print the user as html: `$user->prettyPrint()`
 * Convert the user to an associative array: `$user->asArray()`
+
+### Testing interface
+
+For the purposes of testing, it is possible to change the URL of the SSO application. There already exists a testing SSO interface
+where can be used for the purposes of development of your application and having access to multiple accounts. The testing SSO interface
+provides the same API as the production SSO interface, but it allows you having access to multiple testing accounts.
+
+You may change the interface by the optional arguments of the constructor of the `SSO` class. In fact, the class `SSO` has three optional
+arguments:
+
+1. `$ssoGatewayUrl` - main URL of the SSO gateway
+2. `$ssoGatewayCheckUrl` - check URL (optional, derived from `$ssoGatewayUrl` if not explicitely set)
+3. `$ssoUserClass` - the class for objects of type user. It must be a subclass of `SPSOstrov\SSO\SSOUser` if set.
+   It is used only if you want to extend the basic functions of the class `SSOUser` in your application. The constructor of the subclass
+   must have then the same interface as the class `SSOUser`.
+
+Both URLs (`$ssoGatewayUrl` a `$ssoGatewayCheckUrl`) may have these values:
+
+- `null` - implicit value - production SSO gateway and its check URL
+- `production` - explicitely set value of the URL of the production SSO gateway
+- `testing` - explicitely set value of the URL of the testing SSO gateway
+- anything else - any URL, `$ssoGatewayCheckUrl` may be also set relatively to `$ssoGatewayUrl`
+
+Examples:
+
+```php
+$sso = new SSO();             // implicitely production SSO gateway
+$sso = new SSO("production"); // explicitely production SSO gateway
+$sso = new SSO("testing");    // testing SSO gateway
+$sso = new SSO("https://www.exapmle.com/ssogw/", "https://www.example.com/ssogw/check.php"); // custom URLs
+$sso = new SSO("production", "testing"); // production gateway URL together with testing check URL (makes no sense, but possible to set)
+```

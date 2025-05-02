@@ -133,3 +133,36 @@ $redirectUrl = $sso->getRedirectUrl($backUrl);
 * Časová značka (unix timestamp) přihlášení uživatele: `$user->getLoginTimestamp()`
 * Vypsání celého uživatele jako html: `$user->prettyPrint()`
 * Převod uživatele na asociativní pole: `$user->asArray()`
+
+
+### Testovací rozhraní
+
+Pro účely testování je možné změnit URL SSO aplikace. Existuje dokonce již připravené testovací SSO rozhraní, na kterém je možné
+odladit aplikaci a mít přístup k vícero účtům. Testovací SSO rozhraní poskytuje navenek stejné API jako produkční SSO rozhraní,
+ale poskytuje navíc funkci přihlášení se pomocí testovacích účtů.
+
+Změnit rozhraní lze skrze nepovinné parametry konstruktoru třídy `SSO`. Ve skutečnosti má konstruktor třídy `SSO` tři nepovinné
+parametry:
+
+1. `$ssoGatewayUrl` - hlavní URL SSO gatewaye
+2. `$ssoGatewayCheckUrl` - URL pro přenos dat přihlášeného uživatele (nepovinné, odvozeno z `$ssoGatewayUrl` pokud není explicitně nastaveno)
+3. `$ssoUserClass` - třída pro objekty typu uživatel. Musí to být podřída třídy `SPSOstrov\SSO\SSOUser`, pokud je nastaveno.
+   Používá se jenom, pokud chcete rozšířit základní funkce třídy `SSOUser` ve vaší aplikaci. Konstruktor podtřídy pak musí mít stejné rozhraní
+   jako konstruktor třídy `SSOUser`.
+
+Obě URL (`$ssoGatewayUrl` a `$ssoGatewayCheckUrl`) mohou mít tyto hodnoty:
+
+- `null` - implicitní nastavení - produkční SSO gateway a její check URL
+- `production` - explicitně nastavená hodnota URL produkční SSO gatewaye
+- `testing` - explicitně nastavená hodnota URL testovací SSO gatewaye
+- cokoliv jiného - libovolné URL, `$ssoGatewayCheckUrl` přitom může být zadáno i relativně vůči `$ssoGatewayUrl`
+
+Příklady:
+
+```php
+$sso = new SSO();             // implicitně produkční SSO gateway
+$sso = new SSO("production"); // explicitně produkční SSO gateway
+$sso = new SSO("testing");    // testovací SSO gateway
+$sso = new SSO("https://www.exapmle.com/ssogw/", "https://www.example.com/ssogw/check.php"); // vlastní nastavení URL
+$sso = new SSO("production", "testing"); // produkční SSO gateway s testovacím check-url (nedává smysl to takto nastavovat, ale možné to je)
+```

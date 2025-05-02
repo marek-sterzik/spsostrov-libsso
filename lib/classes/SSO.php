@@ -9,6 +9,22 @@ use Exception;
  */
 class SSO
 {
+    const SSO_GATEWAY_DEFAULT_VARIANT = "default";
+    const SSO_GATEWAY_VARIANTS = [
+        "default" => [
+            "gateway_url" => "https://titan.spsostrov.cz/ssogw/",
+            "gateway_check_url" => "service-check.php",
+        ],
+        "production" => [
+            "gateway_url" => "https://titan.spsostrov.cz/ssogw/",
+            "gateway_check_url" => "https://titan.spsostrov.cz/ssogw/service-check.php",
+        ],
+        "testing" => [
+            "gateway_url" => "https://home.spsostrov.cz/~sterzik/sso-test.php/",
+            "gateway_check_url" => "https://home.spsostrov.cz/~sterzik/sso-test.php/service-check.php",
+
+        ],
+    ];
     const SSO_GATEWAY_URL = "https://titan.spsostrov.cz/ssogw/";
     const SSO_GATEWAY_CHECK_URL = "service-check.php";
     const SERVICE_ARG = "service";
@@ -42,8 +58,20 @@ class SSO
      */
     public function __construct(?string $ssoGatewayUrl = null, ?string $ssoGatewayCheckUrl = null, ?string $ssoUserClass = null)
     {
-        $this->ssoGatewayUrl = $ssoGatewayUrl ?? self::SSO_GATEWAY_URL;
-        $this->ssoGatewayCheckUrl = $this->resolveRelativePath($ssoGatewayCheckUrl ?? self::SSO_GATEWAY_CHECK_URL, $this->ssoGatewayUrl);
+        if ($ssoGatewayUrl === null) {
+            $ssoGatewayUrl = self::SSO_GATEWAY_DEFAULT_VARIANT;
+        }
+        if ($ssoGatewayCheckUrl === null) {
+            $ssoGatewayCheckUrl = self::SSO_GATEWAY_DEFAULT_VARIANT;
+        }
+        if (isset(self::SSO_GATEWAY_VARIANTS[$ssoGatewayUrl])) {
+            $ssoGatewayUrl = self::SSO_GATEWAY_VARIANTS[$ssoGatewayUrl]['gateway_url'];
+        }
+        if (isset(self::SSO_GATEWAY_VARIANTS[$ssoGatewayCheckUrl])) {
+            $ssoGatewayCheckUrl = self::SSO_GATEWAY_VARIANTS[$ssoGatewayCheckUrl]['gateway_check_url'];
+        }
+        $this->ssoGatewayUrl = $ssoGatewayUrl;
+        $this->ssoGatewayCheckUrl = $this->resolveRelativePath($ssoGatewayCheckUrl, $this->ssoGatewayUrl);
         $this->ssoUserClass = $ssoUserClass ?? SSOUser::class;
         if (!is_a($this->ssoUserClass, SSOUser::class, true)) {
             throw new Exception("ssoUserClass needs to be a subclass of " . SSOUser::class);
