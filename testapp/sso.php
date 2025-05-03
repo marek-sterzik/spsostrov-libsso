@@ -8,7 +8,7 @@ session_start();
 if ($_GET['logout'] ?? null) {
     logIn(null);
 } else {
-    $sso = new SSO();
+    $sso = new SSO($ssoInstance ?? null);
     logIn($sso->doLogin());
 }
 

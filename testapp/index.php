@@ -27,8 +27,12 @@ $user = getLoggedInUser();
             <p class="error">No user info available.</p>
         <?php endif ?>
         <div class="links">
-            <a href="sso.php">SSO Login</a>
-            <a href="sso.php?logout=1">Logout</a>
+            <?php if($user === null): ?>
+                <a href="sso.php">SSO Login</a>
+                <a href="sso-test.php">SSO TEST Login</a>
+            <?php else: ?>
+                <a href="sso.php?logout=1">Logout</a>
+            <?php endif ?>
         </div>
     </div>
 </body>
