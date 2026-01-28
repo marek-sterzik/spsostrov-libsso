@@ -170,7 +170,7 @@ class SSO
     private function querySSOCheckUrl(string $token, ?string $backUrl): ?SSOUser
     {
         $realBackUrlEncoded = base64_encode($x = $this->getRealBackUrl($backUrl));
-        $delim = (strpos("?", $this->ssoGatewayCheckUrl) === false) ? '?' : '&';
+        $delim = (strpos($this->ssoGatewayCheckUrl, "?") === false) ? '?' : '&';
         $checkUrl = sprintf(
             "%s%s%s=%s&%s=%s",
             $this->ssoGatewayCheckUrl,
