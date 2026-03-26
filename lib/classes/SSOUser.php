@@ -17,10 +17,10 @@ class SSOUser
     /** @var bool is the user a dummy user? */
     private bool $dummy;
 
-    /** @var string user's login */
-    private string $login;
+    /** @var string|null user's login (or null for dummy user without login) */
+    private ?string $login;
     
-    /** @var string|null user's full name (or null for dummy user without username) */
+    /** @var string|null user's full name (or null for dummy user) */
     private ?string $name;
     
     /** @var string[] user's groups */
