@@ -3,6 +3,7 @@
 namespace SPSOstrov\SSO;
 
 use DateTime;
+use Exception;
 
 /**
  * This class is responsible for pretty-printing the content of the SSOUser object.
@@ -45,24 +46,32 @@ class SSOUserPrinter
         $html = "";
         $html .= "<table class=\"sso_user_table\">\n";
         $html .= "<tr><th colspan=\"2\" class=\"table_head\">SSO user info</th></tr>\n";
-        $html .= $this->getRowHtml("Login", $user->getLogin());
-        $html .= $this->getRowHtml("Name", $user->getName());
-        $html .= $this->getRowHtml("E-mail", $user->getEmail());
-        $html .= $this->getRowHtml("Group", $user->getGroupName());
-        $html .= $this->getRowHtml("Groups", $user->getGroups());
-        $html .= $this->getRowHtml("Auth by", $user->getAuthBy());
-        $html .= $this->getRowHtml("OU Simple", $user->getOUSimple());
-        $html .= $this->getRowHtml("OU Name", $user->getOUName());
-        $html .= $this->getRowHtml("Is teacher", $user->isTeacher());
-        $html .= $this->getRowHtml("Is student", $user->isStudent());
-        if ($user->isStudent()) {
-            $html .= $this->getRowHtml("Class", $user->getClass());
-            $html .= $this->getRowHtml("Field of study", $user->getFieldOfStudy());
-            $html .= $this->getRowHtml("Study entry year", $user->getStudyEntryYear());
+        $html .= $this->getRowHtml("User type", $user->isDummy() ? 'dummy' : 'normal');
+        try {
+            // Getting login may end up with an exception if the user is a dummy user without login
+            $html .= $this->getRowHtml("Login", $user->getLogin());
+        } catch (Exception $e) {
         }
-        foreach ($user->getOtherData() as $key => $value) {
-            $value = empty($value) ? null : implode(", ", $value);
-            $html .= $this->getRowHtml(sprintf("Other[%s]", $key), $value);
+        if (!$user->isDummy()) {
+            $html .= $this->getRowHtml("Login", $user->getLogin());
+            $html .= $this->getRowHtml("Name", $user->getName());
+            $html .= $this->getRowHtml("E-mail", $user->getEmail());
+            $html .= $this->getRowHtml("Group", $user->getGroupName());
+            $html .= $this->getRowHtml("Groups", $user->getGroups());
+            $html .= $this->getRowHtml("Auth by", $user->getAuthBy());
+            $html .= $this->getRowHtml("OU Simple", $user->getOUSimple());
+            $html .= $this->getRowHtml("OU Name", $user->getOUName());
+            $html .= $this->getRowHtml("Is teacher", $user->isTeacher());
+            $html .= $this->getRowHtml("Is student", $user->isStudent());
+            if ($user->isStudent()) {
+                $html .= $this->getRowHtml("Class", $user->getClass());
+                $html .= $this->getRowHtml("Field of study", $user->getFieldOfStudy());
+                $html .= $this->getRowHtml("Study entry year", $user->getStudyEntryYear());
+            }
+            foreach ($user->getOtherData() as $key => $value) {
+                $value = empty($value) ? null : implode(", ", $value);
+                $html .= $this->getRowHtml(sprintf("Other[%s]", $key), $value);
+            }
         }
         $loginTimestamp = ((new DateTime())->setTimestamp($user->getLoginTimestamp()))->format("c");
         $html .= $this->getRowHtml("Logged in at", $loginTimestamp);

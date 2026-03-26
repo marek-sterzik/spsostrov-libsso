@@ -28,8 +28,9 @@ $user = getLoggedInUser();
         <?php endif ?>
         <div class="links">
             <?php if($user === null): ?>
-                <a href="sso.php">SSO Login</a>
-                <a href="sso-test.php">SSO TEST Login</a>
+                <a href="sso.php">PROD Login</a>
+                <a href="sso-test.php">TEST Login</a>
+                <a href="sso.php?dummy=dummy">Dummy Login</a>
             <?php else: ?>
                 <a href="sso.php?logout=1">Logout</a>
             <?php endif ?>

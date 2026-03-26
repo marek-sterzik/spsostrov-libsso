@@ -136,6 +136,7 @@ $redirectUrl = $sso->getRedirectUrl($backUrl);
 * Unix timestamp when the user logged in: `$user->getLoginTimestamp()`
 * Print the user as html: `$user->prettyPrint()`
 * Convert the user to an associative array: `$user->asArray()`
+* Test if the user is real or dummy (see later): `$user->isDummy()`
 
 ### Testing interface
 
@@ -168,3 +169,75 @@ $sso = new SSO("testing");    // testing SSO gateway
 $sso = new SSO("https://www.exapmle.com/ssogw/", "https://www.example.com/ssogw/check.php"); // custom URLs
 $sso = new SSO("production", "testing"); // production gateway URL together with testing check URL (makes no sense, but possible to set)
 ```
+
+### Dummy users
+
+A dummy user is in fact a non-real user, which has formally the same interface as a real user. SSO library itself never generates a dummy user.
+A dummy user is inteded for the application code using this library to create user objects without the necessity of performing a real authorization.
+A dummy user is therefore formally an instance of the class SSOUser, but such instnace was not created by an SSO authorization, but by an explicit
+creation.
+
+At the current moment, only limited functions are supported for dummy users. In general, accessing only usernames and time of creation is available
+for dummy users. Any attempts accessing other variables will raise an exception.
+
+
+Creation of a dummy user:
+
+```php
+    $user = SSOUser::createDummy();        // create a dummy user without username (username is inaccessible then)
+    $user = SSOUser::createDummy(null);    // same as above - create a dummy user without username
+
+    $user = SSOUser::createDummy("dummy"); // create a dummy user with username "dummy"
+```
+
+Test, if an user is a dummy user:
+```php
+    if ($user->isDummy()) {
+        echo "This is a dummy user!";
+    } else {
+        echo "This is a real user!";
+    }
+```
+
+Differences between real and dummy users:
+
+* Only these attributes are accessible on dummy users:
+   * username (if it is not a dummy user without username): `$user->getLogin()`
+   * information if it is a dummy user or real user: `$user->isDummy()`
+   * information about the time of login (interpreted as creation time on dummy users): `$user->getLoginTimestamp()`
+* Any attempt of accessing other attributes on dummy users will raise an exception.
+* The array of all user's attributes (`$user->asArray()`) does not access inaccessible attributes for dummy users.
+* The method `$user->prettyPrint()` does print only accessible attributes for dummy users.
+
+The reason for dummy users is not in being used for direct authorization, but to extend ways of using this library in more complicated projects where standard
+authorization is not sufficient. Dummy users may be used together with extending the `SSOUser` class (see later).
+
+
+### Extending the SSOUser class
+
+If not said otherwise, an instance of the `SSO` class creates instances of the class `SSOUser`. In some circumstances this standard behavior may be changed
+and the library may generate even descendants of this class. That may be done using the third argument of the class `SSO`, which denotes the class which
+should be used to create user instances. This may effectively extend the functions of the `SSOUser` class. To achieve this goal, these conditions
+must be met:
+
+
+* the extending class must be a descendant of the class `SSOUser`
+* the extending class must have the same signature of the constructor as `SSOUser` (and the constructor of `SSOUser` must be internally invoked)
+
+Example:
+```php
+class SSOUserExtended extends SSOUser
+{
+    public function isInvalid(): bool
+    {
+        return !$this->isTeacher() && !$this->isStudent();
+    }
+}
+
+$sso = new SSO(null, null, SSOUserExtended::class);
+
+$user = $user->doLogin(); // $user is now an instance of SSOUserExtended
+```
+
+This example extends the features of class `SSOUser` by a new method `isInvalid()` which is able to test if an user is valid in some sense
+(it must be a teacher or a student, which the rules of the SSO protocol does not guarantee, that an user is at least one of them).

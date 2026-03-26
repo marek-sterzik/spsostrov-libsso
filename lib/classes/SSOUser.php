@@ -2,6 +2,8 @@
 
 namespace SPSOstrov\SSO;
 
+use Exception;
+
 /**
  * This class represents the currently logged in user from SSO.
  */
@@ -12,11 +14,14 @@ class SSOUser
     const OU_STUDENT_REGEXP_FOS_FIELD = 3;
     const OU_STUDENT_REGEXP_YEAR_FIELD = 2;
 
+    /** @var bool is the user a dummy user? */
+    private bool $dummy;
+
     /** @var string user's login */
     private string $login;
     
-    /** @var string user's full name */
-    private string $name;
+    /** @var string|null user's full name (or null for dummy user without username) */
+    private ?string $name;
     
     /** @var string[] user's groups */
     private array $groups = [];
@@ -42,23 +47,42 @@ class SSOUser
     /** @var int unix timestamp when the login was proceeded */
     private int $loginTimestamp;
 
+    public static function createDummy(?string $username = null)
+    {
+        return new static(['login' => isset($username) ? [$username] : [], "_dummy" => ["1"]], time());
+    }
+
     /**
      * Create an user. The user should never be created manually. The user is
      * always created by the class SSO.
      */
     public function __construct(array $data, int $loginTimestamp)
     {
+        $this->dummy = $this->extractKey($data, "_dummy") ? true : false;
         $this->login = $this->extractKey($data, "login");
-        $this->name = $this->extractKey($data, "name");
-        $this->groups = $this->extractKey($data, "group", true);
-        $this->email = $this->extractKey($data, "mail");
-        $this->groupName = $this->extractKey($data, "group_name");
-        $this->groupName = ($this->groupName === '') ? null : $this->groupName;
-        $this->authBy = $this->extractKey($data, "auth_by");
-        $this->ouSimple = $this->extractKey($data, "ou_simple");
-        $this->ouName = $this->extractKey($data, "ou_name");
-        $this->otherData = $data;
+        if (!$this->dummy) {
+            if ($this->login === null) {
+                throw new Exception("Missing login for non-dummy user");
+            }
+            $this->name = $this->extractKey($data, "name");
+            $this->groups = $this->extractKey($data, "group", true);
+            $this->email = $this->extractKey($data, "mail");
+            $this->groupName = $this->extractKey($data, "group_name");
+            $this->groupName = ($this->groupName === '') ? null : $this->groupName;
+            $this->authBy = $this->extractKey($data, "auth_by");
+            $this->ouSimple = $this->extractKey($data, "ou_simple");
+            $this->ouName = $this->extractKey($data, "ou_name");
+            $this->otherData = $data;
+        }
         $this->loginTimestamp = $loginTimestamp;
+    }
+
+    /**
+     * @return bool Is dummy user
+     */
+    public function isDummy(): bool
+    {
+        return $this->dummy;
     }
 
     /**
@@ -66,6 +90,9 @@ class SSOUser
      */
     public function getLogin(): string
     {
+        if ($this->login === null) {
+            $this->notDummy();
+        }
         return $this->login;
     }
 
@@ -74,6 +101,7 @@ class SSOUser
      */
     public function getName(): string
     {
+        $this->notDummy();
         return $this->name;
     }
 
@@ -82,6 +110,7 @@ class SSOUser
      */
     public function getGroupName(): ?string
     {
+        $this->notDummy();
         return $this->groupName;
     }
 
@@ -90,6 +119,7 @@ class SSOUser
      */
     public function getGroups(): array
     {
+        $this->notDummy();
         return $this->groups;
     }
 
@@ -100,6 +130,7 @@ class SSOUser
      */
     public function hasGroup(string $group): bool
     {
+        $this->notDummy();
         return in_array($group, $this->groups);
     }
 
@@ -108,6 +139,7 @@ class SSOUser
      */
     public function getEmail(): ?string
     {
+        $this->notDummy();
         return $this->email;
     }
 
@@ -116,6 +148,7 @@ class SSOUser
      */
     public function getAuthBy(): ?string
     {
+        $this->notDummy();
         return $this->authBy;
     }
 
@@ -124,6 +157,7 @@ class SSOUser
      */
     public function getOUSimple(): ?string
     {
+        $this->notDummy();
         return $this->ouSimple;
     }
 
@@ -132,6 +166,7 @@ class SSOUser
      */
     public function getOUName(): ?string
     {
+        $this->notDummy();
         return $this->ouName;
     }
 
@@ -140,6 +175,7 @@ class SSOUser
      */
     public function isTeacher(): bool
     {
+        $this->notDummy();
         return $this->ouSimple === self::OU_TEACHER;
     }
 
@@ -148,6 +184,7 @@ class SSOUser
      */
     public function isStudent(): bool
     {
+        $this->notDummy();
         return preg_match(self::OU_STUDENT_REGEXP, $this->ouSimple);
     }
 
@@ -156,6 +193,7 @@ class SSOUser
      */
     public function getClass(): ?string
     {
+        $this->notDummy();
         return $this->isStudent() ? $this->getOUName() : null;
     }
 
@@ -164,6 +202,7 @@ class SSOUser
      */
     public function getFieldOfStudy(): ?string
     {
+        $this->notDummy();
         $fos = $this->getOUStudentField(self::OU_STUDENT_REGEXP_FOS_FIELD);
         return isset($fos) ? strtoupper($fos) : $fos;
     }
@@ -173,6 +212,7 @@ class SSOUser
      */
     public function getStudyEntryYear(): ?int
     {
+        $this->notDummy();
         $year = $this->getOUStudentField(self::OU_STUDENT_REGEXP_YEAR_FIELD);
         if ($year === null) {
             return null;
@@ -198,6 +238,7 @@ class SSOUser
      */
     public function getOtherData(): array
     {
+        $this->notDummy();
         return $this->otherData;
     }
 
@@ -226,8 +267,13 @@ class SSOUser
      */
     public function asArray(): array
     {
-        return [
+        $this->notDummy();
+        $info = [
+            "isDummy" => $this->dummy,
             "login" => $this->login,
+        ];
+
+        $info = array_merge($info, [
             "name" => $this->name,
             "groupName" => $this->groupName,
             "groups" => $this->groups,
@@ -242,7 +288,8 @@ class SSOUser
             "class" => $this->getClass(),
             "otherData" => $this->otherData,
             "loginTimestamp" => $this->loginTimestamp,
-        ];
+        ]);
+        return $info;
     }
 
     private function extractKey(array &$data, string $key, bool $multiValue = false)
@@ -258,5 +305,12 @@ class SSOUser
             return null;
         }
         return $matches[$field] ?? null;
+    }
+
+    private function notDummy()
+    {
+        if ($this->dummy) {
+            throw new Exception("Cannot access properties of a dummy SSO user");
+        }
     }
 }

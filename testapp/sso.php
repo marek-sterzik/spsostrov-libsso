@@ -7,6 +7,8 @@ session_start();
 
 if ($_GET['logout'] ?? null) {
     logIn(null);
+} elseif (($_GET['dummy'] ?? null) !== null) {
+    logIn(SSOUser::createDummy($_GET['dummy']));
 } else {
     $sso = new SSO($ssoInstance ?? null);
     logIn($sso->doLogin());

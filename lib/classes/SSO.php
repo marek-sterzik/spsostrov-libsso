@@ -53,8 +53,11 @@ class SSO
     /**
      * Create a new instnace of the SSO library.
      *
-     * @param string|null $ssoGatewayUrl SSO gateway URL (use default if not speicfied)
+     * @param string|null $ssoGatewayUrl      SSO gateway URL (use default if not speicfied)
      * @param string|null $ssoGatewayCheckUrl SSO gateway check URL (use default if not specified)
+     * @param string|null $ssoUserClass       class name of the instance of the sso user which will be used
+     *                                        (must be a subclass of SSOUser and the constructor of the
+     *                                        class must have the same signature as SSOUser)
      */
     public function __construct(?string $ssoGatewayUrl = null, ?string $ssoGatewayCheckUrl = null, ?string $ssoUserClass = null)
     {

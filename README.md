@@ -133,6 +133,7 @@ $redirectUrl = $sso->getRedirectUrl($backUrl);
 * Časová značka (unix timestamp) přihlášení uživatele: `$user->getLoginTimestamp()`
 * Vypsání celého uživatele jako html: `$user->prettyPrint()`
 * Převod uživatele na asociativní pole: `$user->asArray()`
+* Test zda je uživatel reálný nebo dummy (vysvětleno dále): `$user->isDummy()`
 
 
 ### Testovací rozhraní
@@ -166,3 +167,72 @@ $sso = new SSO("testing");    // testovací SSO gateway
 $sso = new SSO("https://www.exapmle.com/ssogw/", "https://www.example.com/ssogw/check.php"); // vlastní nastavení URL
 $sso = new SSO("production", "testing"); // produkční SSO gateway s testovacím check-url (nedává smysl to takto nastavovat, ale možné to je)
 ```
+
+### Dummy uživatelé
+
+Dummy uživatel je ve skutečnosti nereálný uživatel, který ale formálně má stejné rozhraní jako reálný uživatel. SSO knihovna sama nikdy negeneruje dummy uživatele.
+Dummy uživatel slouží jenom k tomu, aby si jej mohl vytvořit kód aplikace používající knihovnu, aniž by došlo k reálné autorizaci. Dummy uživatel je tak formálně
+instancí třídy `SSOUser`, ale taková instance nevznikla reálně proběhlou SSO autorizací, ale explicitním vytvořením.
+
+V současné době jsou podporovány pouze omezené možnosti nesení informací u dummy uživatelů. V obecnosti lze u dummy přistoupit jenom k uživatelskému jménu a k
+času vytvoření. Pokus o přístup k ostatním údajům skončí vyvoláním výjimky.
+
+Vytvoření dummy uživatele:
+
+```php
+    $user = SSOUser::createDummy();        // vytvoří dummy uživatele bez uživatelského jména. (ani k uživatelskému jménu pak nelze přistupovat)
+    $user = SSOUser::createDummy(null);    // stejné jako výše, vytvoří dummy uživatele bez uživatelského jména
+
+    $user = SSOUser::createDummy("dummy"); // vytvoří dummy uživatele s uživatelským jménem "dummy"
+```
+
+Test, zda je uživatel reálným nebo dummy uživatelem:
+```php
+    if ($user->isDummy()) {
+        echo "Toto je dummy uživatel!";
+    } else {
+        echo "Toto je reálný uživate!";
+    }
+```
+
+Rozdíly mezi reálným a dummy uživatelem:
+
+* U dummy uživatele lze přistupovat pouze k těmto údajům:
+   * uživatelskému jménu (není-li to dummy uživatel bez uživatelského jména): `$user->getLogin()`
+   * informaci, zda je uživatel dummy uživatelem nebo reálným uživatelem: `$user->isDummy()`
+   * informaci o času posledního přihlášení (u dummy uživatele je časem vytvoření): `$user->getLoginTimestamp()`
+* Pokus o přístup k jakýmkoliv jiným údajům, než výše zmíněným, vyvolá u dummy uživatele výjimku.
+* Pole všech údajů o uživateli (`$user->asArray()`) nevrací u dummy uživatelů nedostupné údaje.
+* Příkaz `$user->prettyPrint()` vypisuje u dummy uživatelů pouze dostupné údaje.
+
+Smyslem dummy uživatelů není řešit otázku přímé autorizace, ale rozšířit možnosti autorizace u složitějších projektů o další možnosti kde standardní autorizace
+není dostačující. Dummy uživatele lze používat společně s rozšířením třídy `SSOUser` (vizte dále).
+
+
+### Rozšíření třídy SSOUser
+
+Pokud není řečeno jinak, instance třídy `SSO` vytváří instance třídy `SSOUser`. Za určitých okolností lze ale toto standardní chování změnit a knihovna může
+generovat i instance potomků této třídy. Toho se dosáhne využitím třetího parametru konstruktoru třídy `SSO`, kterým se označuje třída, která se má použít
+k vytváření instancí uživatelů. To umožňuje efektivně uživatelům knihovny rozšiřovat knihovní funkce třídy `SSOUser`. Aby to bylo možné, musí být u
+rozšiřující třídy splněny tyto podmínky:
+
+* rozšiřující třída dědí od třídy `SSOUser`
+* rozšiřující třída používá stejnou signaturu konstruktoru jako třída `SSOUser` (a konstruktor rozšiřující třídy interně volá konstruktor `SSOUser`)
+
+Příklad:
+```php
+class SSOUserExtended extends SSOUser
+{
+    public function isInvalid(): bool
+    {
+        return !$this->isTeacher() && !$this->isStudent();
+    }
+}
+
+$sso = new SSO(null, null, SSOUserExtended::class);
+
+$user = $user->doLogin(); // $user je instance třídy SSOUserExtended
+```
+
+Tento příklad rozšiřuje funkce třídy `SSOUser` o novou metodu `isInvalid()` která je schopná u uživatele testovat zda je validní
+(musí být buď učitel nebo student, což pravidla SSO protokolu nezaručují, aby byl aspoň jedním nebo druhým).
