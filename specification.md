@@ -39,7 +39,7 @@ The *user data requesting url* has two parameters:
 
 When the *main page* is passing the token back to the Requesting application, it is passing it in the query parameter `ticket`.
 
-##Example
+## Example
 
 Lets have an service `www.example.com`, which has implemented the callback url `https://www.example.com/sso-login`. The SSO authentication process will look like this:
 
